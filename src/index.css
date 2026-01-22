@@ -7,6 +7,22 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  background: linear-gradient(135deg, #4c51bf 0%, #5b21b6 25%, #d946ef 50%, #0ea5e9 75%, #06b6d4 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  min-height: 100vh;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* 시니어용 큰 텍스트 */
@@ -45,10 +61,54 @@ body {
   animation: float 3s ease-in-out infinite;
 }
 
+/* 자세히보기 펼침/접힘 애니메이션 */
+@keyframes expandDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1500px;
+    transform: translateY(0);
+  }
+}
+
+.expand-animation {
+  animation: expandDown 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  overflow: hidden;
+}
+
 /* 접근성: 포커스 표시 강화 */
 *:focus-visible {
   outline: 3px solid #0ea5e9;
   outline-offset: 2px;
+}
+
+/* 스크롤 애니메이션 */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+}
+
+.scroll-reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 스크롤 애니메이션 딜레이 */
+.scroll-reveal-delay-1 {
+  transition-delay: 0.1s;
+}
+
+.scroll-reveal-delay-2 {
+  transition-delay: 0.2s;
+}
+
+.scroll-reveal-delay-3 {
+  transition-delay: 0.3s;
 }
 
 /* 스크롤바 스타일링 */

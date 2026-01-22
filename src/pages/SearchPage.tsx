@@ -1,8 +1,10 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Search, Volume2, Filter, Mic, MicOff } from 'lucide-react';
+import { Search, Volume2, Filter, Mic, MicOff, Loader2 } from 'lucide-react';
 import { translations } from '../data/translations';
 import { Translation } from '../types';
+import { getAITranslationWithCache, AITranslationResponse } from '../services/aiTranslation';
+import AIResultCard from '../components/AIResultCard';
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -11,6 +13,9 @@ export default function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isListening, setIsListening] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [aiResult, setAiResult] = useState<AITranslationResponse | null>(null);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   useEffect(() => {
     const q = searchParams.get('q') || '';
@@ -18,7 +23,7 @@ export default function SearchPage() {
     performSearch(q);
   }, [searchParams]);
 
-  const performSearch = (searchQuery: string, category: string = selectedCategory) => {
+  const performSearch = async (searchQuery: string, category: string = selectedCategory) => {
     const lowerQuery = searchQuery.toLowerCase();
     let filtered = translations;
 
@@ -38,6 +43,30 @@ export default function SearchPage() {
     }
 
     setResults(filtered);
+
+    // 검색 결과가 없고 검색어가 있으면 AI 번역 시도
+    if (filtered.length === 0 && searchQuery.trim()) {
+      await tryAITranslation(searchQuery);
+    } else {
+      setAiResult(null);
+      setAiError(null);
+    }
+  };
+
+  const tryAITranslation = async (term: string) => {
+    setIsLoadingAI(true);
+    setAiError(null);
+    
+    try {
+      const result = await getAITranslationWithCache(term);
+      setAiResult(result);
+    } catch (error) {
+      console.error('AI Translation Error:', error);
+      setAiError('AI 번역을 불러올 수 없습니다. n8n 워크플로우가 실행 중인지 확인해주세요.');
+      setAiResult(null);
+    } finally {
+      setIsLoadingAI(false);
+    }
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -164,6 +193,7 @@ export default function SearchPage() {
         <h2 className="text-xl font-bold text-gray-800">
           {results.length}개의 결과
           {query && <span className="text-primary-600"> - "{query}"</span>}
+          {aiResult && <span className="text-purple-600 ml-2">+ AI 번역</span>}
         </h2>
         
         {isListening && (
@@ -172,19 +202,86 @@ export default function SearchPage() {
             <span className="font-semibold">듣고 있습니다...</span>
           </div>
         )}
+
+        {isLoadingAI && (
+          <div className="flex items-center gap-2 text-purple-600">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span className="font-semibold">AI 번역 중...</span>
+          </div>
+        )}
       </div>
+
+      {/* AI Translation Result */}
+      {aiResult && !isLoadingAI && (
+        <AIResultCard result={aiResult} onSpeak={speak} />
+      )}
+
+      {/* AI Error */}
+      {aiError && (
+        <div className="bg-red-50 border-2 border-red-300 rounded-xl p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-2xl">⚠️</span>
+            <h3 className="text-lg font-bold text-red-800">AI 번역 실패</h3>
+          </div>
+          <p className="text-red-700 mb-3">{aiError}</p>
+          <details className="text-sm text-red-600">
+            <summary className="cursor-pointer hover:text-red-800 font-semibold mb-2">
+              해결 방법 보기 ▼
+            </summary>
+            <div className="bg-white p-4 rounded-lg mt-2 space-y-2">
+              <p>1. n8n이 실행 중인지 확인: http://localhost:5678</p>
+              <p>2. 워크플로우가 활성화되어 있는지 확인</p>
+              <p>3. OpenAI API 키가 올바르게 설정되었는지 확인</p>
+              <p>4. .env 파일의 VITE_N8N_WEBHOOK_URL이 올바른지 확인</p>
+              <p className="text-primary-600 font-semibold mt-3">
+                자세한 설정 방법: N8N_SETUP_GUIDE.md 참고
+              </p>
+            </div>
+          </details>
+        </div>
+      )}
 
       {/* Results List */}
       {results.length > 0 ? (
         <div className="grid gap-4">
           {results.map((translation) => {
             const isExpanded = expandedId === translation.id;
+            
+            // 카테고리별 배경색 정의
+            const categoryStyles = {
+              pangyo: {
+                bg: 'bg-gradient-to-br from-orange-50 to-amber-50',
+                border: 'border-orange-200',
+                badge: 'bg-orange-500 text-white',
+                text: 'text-orange-700'
+              },
+              digital: {
+                bg: 'bg-gradient-to-br from-blue-50 to-sky-50',
+                border: 'border-blue-200',
+                badge: 'bg-blue-500 text-white',
+                text: 'text-blue-700'
+              },
+              trend: {
+                bg: 'bg-gradient-to-br from-pink-50 to-rose-50',
+                border: 'border-pink-200',
+                badge: 'bg-pink-500 text-white',
+                text: 'text-pink-700'
+              },
+              tech: {
+                bg: 'bg-gradient-to-br from-purple-50 to-violet-50',
+                border: 'border-purple-200',
+                badge: 'bg-purple-500 text-white',
+                text: 'text-purple-700'
+              }
+            };
+            
+            const style = categoryStyles[translation.category as keyof typeof categoryStyles] || categoryStyles.tech;
 
             return (
               <div
                 key={translation.id}
-                className={`bg-white rounded-xl shadow-md hover:shadow-lg transition-all p-5 border-2 ${
-                  isExpanded ? 'border-primary-500' : 'border-transparent'
+                className={`${style.bg} rounded-xl shadow-md hover:shadow-lg transition-all p-5 border-2 ${
+                  isExpanded ? style.border : 'border-transparent'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -197,24 +294,19 @@ export default function SearchPage() {
                         <h3 className="text-xl font-bold text-gray-800">
                           {translation.term}
                         </h3>
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          translation.category === 'pangyo' ? 'bg-blue-100 text-blue-700' :
-                          translation.category === 'digital' ? 'bg-green-100 text-green-700' :
-                          translation.category === 'trend' ? 'bg-pink-100 text-pink-700' :
-                          'bg-purple-100 text-purple-700'
-                        }`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm ${style.badge}`}>
                           {translation.category === 'pangyo' ? '판교어' :
                            translation.category === 'digital' ? '디지털' : 
                            translation.category === 'trend' ? 'MZ' : '기술'}
                         </span>
                       </div>
-                      <p className="text-lg text-primary-700 font-semibold">
+                      <p className={`text-lg font-semibold ${style.text}`}>
                         {translation.simple}
                       </p>
                     </button>
 
                     {isExpanded && (
-                      <div className="mt-4 space-y-4">
+                      <div className="mt-4 space-y-4 expand-animation">
                         <div>
                           <p className="text-sm text-gray-600 mb-1">자세한 설명</p>
                           <p className="text-gray-700 leading-relaxed">{translation.detailed}</p>

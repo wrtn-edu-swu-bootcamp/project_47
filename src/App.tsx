@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import CategoryPage from './pages/CategoryPage';
 import SearchPage from './pages/SearchPage';
+import GuidePage from './pages/GuidePage';
 import Layout from './components/Layout';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/category/:id" element={<CategoryPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/guide" element={<GuidePage />} />
         </Routes>
       </Layout>
     </Router>

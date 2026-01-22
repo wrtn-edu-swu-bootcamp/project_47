@@ -1,0 +1,83 @@
+{
+  "name": "판교어 AI 번역 워크플로우",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "translate",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "판교어-번역"
+    },
+    {
+      "parameters": {
+        "functionCode": "const inputData = $input.all()[0].json;\nconst term = inputData.term || inputData.body?.term || '';\nconst context = inputData.context || '';\n\nreturn {\n  json: {\n    term: term,\n    context: context,\n    prompt: `당신은 한국어 언어 전문가입니다. 다음 단어나 표현을 MZ세대나 비전공자도 쉽게 이해할 수 있도록 설명해주세요.\\n\\n단어: \"${term}\"\\n${context ? `맥락: ${context}` : ''}\\n\\n다음 형식으로 JSON만 응답해주세요:\\n{\\n  \"simple\": \"한 줄로 쉽게 설명 (20자 이내)\",\\n  \"detailed\": \"자세한 설명 (2-3문장, 어원이나 배경 포함)\",\\n  \"example\": \"원래: 실제 사용 예시\\\\n쉽게: 쉬운 표현\",\\n  \"category\": \"pangyo/digital/trend/tech 중 하나\"\\n}\\n\\n반드시 JSON 형식만 응답하세요.`\n  }\n};"
+      },
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "message",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "당신은 IT 용어와 MZ 신조어를 쉽게 설명하는 전문가입니다. 항상 JSON 형식으로만 응답합니다."
+            },
+            {
+              "role": "user",
+              "content": "={{ $json.prompt }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 500
+        }
+      },
+      "name": "OpenAI",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const response = $input.all()[0].json;\nconst content = response.message?.content || response.choices?.[0]?.message?.content || '';\n\nlet parsed;\ntry {\n  const cleanContent = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  parsed = JSON.parse(cleanContent);\n} catch (e) {\n  console.error('JSON Parse Error:', e);\n  parsed = {\n    simple: content.substring(0, 100),\n    detailed: content,\n    example: '',\n    category: 'tech'\n  };\n}\n\nreturn {\n  json: {\n    term: $('Parse Input').item.json.term,\n    simple: parsed.simple || '번역 결과를 가져올 수 없습니다',\n    detailed: parsed.detailed || '',\n    example: parsed.example || '',\n    category: parsed.category || 'tech',\n    isAI: true,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "Format Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Parse Input", "type": "main", "index": 0}]]
+    },
+    "Parse Input": {
+      "main": [[{"node": "OpenAI", "type": "main", "index": 0}]]
+    },
+    "OpenAI": {
+      "main": [[{"node": "Format Response", "type": "main", "index": 0}]]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "id": "pangyo-translator-ai"
+}

@@ -17,7 +17,7 @@ export interface UserCategory {
   name: string;
   description: string;
   color: string;
-  icon: string;
+  icon: any; // React component from lucide-react
 }
 
 export interface SearchResult extends Translation {

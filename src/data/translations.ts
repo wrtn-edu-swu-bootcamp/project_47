@@ -1,4 +1,5 @@
 import { Translation } from '../types';
+import { Heart, Zap, Rocket } from 'lucide-react';
 
 export const translations: Translation[] = [
   {
@@ -414,20 +415,20 @@ export const userCategories = [
     name: '천천히 배우기',
     description: '디지털이 처음이신 분들을 위한 친절한 가이드',
     color: 'senior',
-    icon: '🌻'
+    icon: Heart
   },
   {
     id: 'mz' as const,
     name: '요즘 그거 뭔데?',
     description: '트렌드와 밈을 빠르게 이해하는 공간',
     color: 'mz',
-    icon: '✨'
+    icon: Zap
   },
   {
     id: 'newbie' as const,
     name: '판교 생존 가이드',
     description: 'IT 업계 첫 출근을 위한 필수 사전',
     color: 'newbie',
-    icon: '🚀'
+    icon: Rocket
   }
 ];

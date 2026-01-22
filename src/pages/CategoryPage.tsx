@@ -45,7 +45,10 @@ export default function CategoryPage() {
 
       {/* Category Header */}
       <div className={`bg-gradient-to-r from-${category.color}-100 to-${category.color}-50 rounded-2xl p-8 shadow-lg`}>
-        <div className="text-6xl mb-4">{category.icon}</div>
+        <div className="mb-4">
+          {/* Lucide Icon 렌더링 */}
+          <category.icon className="w-20 h-20 text-gray-700" strokeWidth={1.5} />
+        </div>
         <h1 className={`text-4xl font-bold text-gray-800 mb-3 ${isSenior ? 'senior-text' : ''}`}>
           {category.name}
         </h1>
@@ -78,12 +81,38 @@ export default function CategoryPage() {
         <div className="grid gap-4">
           {categoryTranslations.map((translation) => {
             const isExpanded = expandedId === translation.id;
+            
+            // 카테고리별 배경색 정의
+            const categoryStyles = {
+              pangyo: {
+                bg: 'bg-gradient-to-br from-orange-50 to-amber-50',
+                border: 'border-orange-300',
+                badge: 'bg-orange-500 text-white'
+              },
+              digital: {
+                bg: 'bg-gradient-to-br from-blue-50 to-sky-50',
+                border: 'border-blue-300',
+                badge: 'bg-blue-500 text-white'
+              },
+              trend: {
+                bg: 'bg-gradient-to-br from-pink-50 to-rose-50',
+                border: 'border-pink-300',
+                badge: 'bg-pink-500 text-white'
+              },
+              tech: {
+                bg: 'bg-gradient-to-br from-purple-50 to-violet-50',
+                border: 'border-purple-300',
+                badge: 'bg-purple-500 text-white'
+              }
+            };
+            
+            const style = categoryStyles[translation.category as keyof typeof categoryStyles] || categoryStyles.tech;
 
             return (
               <div
                 key={translation.id}
-                className={`bg-white rounded-xl shadow-md hover:shadow-lg transition-all border-2 ${
-                  isExpanded ? 'border-primary-500' : 'border-transparent'
+                className={`${style.bg} rounded-xl shadow-md hover:shadow-lg transition-all border-2 ${
+                  isExpanded ? style.border : 'border-transparent'
                 } ${isSenior ? 'p-6' : 'p-5'}`}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -92,16 +121,23 @@ export default function CategoryPage() {
                       onClick={() => setExpandedId(isExpanded ? null : translation.id)}
                       className="text-left w-full"
                     >
-                      <h3 className={`font-bold text-gray-800 mb-2 ${isSenior ? 'text-2xl' : 'text-xl'}`}>
-                        {translation.term}
-                      </h3>
-                      <p className={`text-primary-700 font-semibold ${isSenior ? 'text-xl' : 'text-lg'}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className={`font-bold text-gray-800 ${isSenior ? 'text-2xl' : 'text-xl'}`}>
+                          {translation.term}
+                        </h3>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm ${style.badge}`}>
+                          {translation.category === 'pangyo' ? '판교어' :
+                           translation.category === 'digital' ? '디지털' : 
+                           translation.category === 'trend' ? 'MZ' : '기술'}
+                        </span>
+                      </div>
+                      <p className={`text-gray-700 font-semibold ${isSenior ? 'text-xl' : 'text-lg'}`}>
                         {translation.simple}
                       </p>
                     </button>
 
                     {isExpanded && (
-                      <div className={`mt-4 space-y-4 ${isSenior ? 'text-lg' : 'text-base'}`}>
+                      <div className={`mt-4 space-y-4 expand-animation ${isSenior ? 'text-lg' : 'text-base'}`}>
                         <div>
                           <p className="text-sm text-gray-600 mb-1">자세한 설명</p>
                           <p className="text-gray-700 leading-relaxed">{translation.detailed}</p>
