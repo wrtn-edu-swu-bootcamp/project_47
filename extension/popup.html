@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>판교어 번역기</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 350px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 40px 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .search-box button {
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.3s;
+    }
+
+    .search-box button:hover {
+      background: #5568d3;
+    }
+
+    .result {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result h3 {
+      color: #667eea;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .result .simple {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .result .detailed {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .no-result {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+      display: none;
+    }
+
+    .no-result.show {
+      display: block;
+    }
+
+    .features {
+      border-top: 1px solid #e0e0e0;
+      padding-top: 15px;
+    }
+
+    .features h3 {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-list li {
+      font-size: 12px;
+      color: #888;
+      padding: 5px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .feature-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 11px;
+    }
+
+    .speaker-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      color: #667eea;
+      float: right;
+    }
+
+    .speaker-btn:hover {
+      color: #5568d3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 판교어 번역기</h1>
+      <p>판교어를 쉬운 말로 바꿔드려요</p>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="검색할 단어를 입력하세요...">
+      <button id="searchBtn">검색</button>
+    </div>
+
+    <div id="result" class="result">
+      <button id="speakBtn" class="speaker-btn" title="읽어주기">🔊</button>
+      <h3 id="termName"></h3>
+      <div class="simple" id="simpleText"></div>
+      <div class="detailed" id="detailedText"></div>
+    </div>
+
+    <div id="noResult" class="no-result">
+      검색 결과가 없습니다
+    </div>
+
+    <div class="features">
+      <h3>💡 이렇게 사용하세요</h3>
+      <ul class="feature-list">
+        <li>웹페이지에서 단어를 드래그하면 자동 번역</li>
+        <li>모르는 판교어를 검색창에 입력</li>
+        <li>스피커 버튼으로 음성 듣기</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    Made with ❤️ for 판교 생존자들
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

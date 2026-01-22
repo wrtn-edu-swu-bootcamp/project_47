@@ -1,0 +1,76 @@
+.pangyo-translator-tooltip {
+  position: absolute;
+  background: white;
+  border: 2px solid #667eea;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: 999999;
+  min-width: 200px;
+  max-width: 350px;
+  animation: pangyoFadeIn 0.2s ease-out;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@keyframes pangyoFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pangyo-tooltip-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 15px;
+  border-radius: 10px 10px 0 0;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pangyo-close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 20px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+
+.pangyo-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.pangyo-tooltip-content {
+  padding: 15px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Highlight pangyo terms on hover */
+.pangyo-highlight {
+  background-color: rgba(102, 126, 234, 0.1);
+  border-bottom: 2px dotted #667eea;
+  cursor: help;
+  transition: background-color 0.2s;
+}
+
+.pangyo-highlight:hover {
+  background-color: rgba(102, 126, 234, 0.2);
+}

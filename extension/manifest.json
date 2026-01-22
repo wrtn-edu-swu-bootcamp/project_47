@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "판교어 번역기",
+  "version": "1.0.0",
+  "description": "웹페이지의 판교어와 전문용어를 실시간으로 번역하는 확장 프로그램",
+  "permissions": ["activeTab", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
